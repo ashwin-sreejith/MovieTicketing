@@ -2,13 +2,14 @@ from customer import Customer
 
 
 class RewardFlatCustomer(Customer):
-    """ Class to handle customers in rewards program"""
+    """ Class to handle customers in flat rewards program"""
 
     # Constructor to instantiate objects
     def __init__(self, customer_id, customer_name):
         # invokes constructor of parent class
         super().__init__(customer_id, customer_name)
         self._discount_rate = 0.2
+        self._discount = 0
 
     # getter for discount rate
     def get_discount_rate(self):
@@ -20,12 +21,13 @@ class RewardFlatCustomer(Customer):
 
     # overrides similar function of parent to calculate discount as 20% of cost
     def get_discount(self, cost):
-        return self._discount_rate * cost
+        self._discount = self._discount_rate * cost
+        return self._discount
 
     # overrides display_info method of customer class to print discount rate as well
     def display_info(self):
-        print(f"Customer ID : {self._customer_id}\n" + f"Customer Name : {self._customer_name}\n" +
-              f"Discount : {self._discount_rate}")
+        print(f"Flat rewards Customer ID : {self._customer_id}\n" + f"Customer Name : {self._customer_name}\n" +
+              f"Discount : {self._discount}")
 
     # Other getter methods for customer name and ID are not overridden in this class as there is no modifications to be
     # made to those functions. Since the child already inherits those functions from the parent, they can be accessed
