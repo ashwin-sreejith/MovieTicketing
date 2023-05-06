@@ -1,6 +1,9 @@
 from customer import Customer
 from rewardFlatCustomer import RewardFlatCustomer
 from rewardStepCustomer import RewardStepCustomer
+from movie import Movie
+from ticket import Ticket
+from booking import Booking
 
 customer1 = Customer(4, 'Ash')
 print(customer1.get_customer_id())
@@ -21,4 +24,8 @@ print(customer3.get_discount(25))
 print(customer3.get_discount(65))
 customer3.display_info()
 
+movie1 = Movie(1, "Avatar", 50)
+ticket1 = Ticket(1, "adult", 25)
+booking1 = Booking(customer2, movie1, ticket1, 2)
+print(booking1.compute_cost())
 
