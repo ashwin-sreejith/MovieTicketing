@@ -26,8 +26,8 @@ class RewardFlatCustomer(Customer):
 
     # overrides display_info method of customer class to print discount rate as well
     def display_info(self):
-        print(f"Flat rewards Customer ID : {self._customer_id}\n" + f"Customer Name : {self._customer_name}\n" +
-              f"Discount : {self._discount}")
+        print(f"Flat rewards Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, " +
+              f"Discount rate : {self._discount_rate}, " + f"Availed Discount : {self._discount}")
 
     # Other getter methods for customer name and ID are not overridden in this class as there is no modifications to be
     # made to those functions. Since the child already inherits those functions from the parent, they can be accessed

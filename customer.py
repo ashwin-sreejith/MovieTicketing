@@ -32,7 +32,7 @@ class Customer:
 
     # displays customer information
     def display_info(self):
-        print(f"Customer ID : {self._customer_id}\n" + f"Customer Name : {self._customer_name}")
+        print(f"Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, Discount : 0")
 
 
 

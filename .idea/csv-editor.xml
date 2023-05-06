@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CsvFileAttributes">
+    <option name="attributeMap">
+      <map>
+        <entry key="/venv/Assignment2_Sem1_2023/Datasets/Online Shoppers Purchasing Intention Dataset/online_shoppers_intention.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/venv/Assignment2_Sem1_2023/Datasets/Turkish Music Emotion Dataset Data Set/Acoustic Features.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/venv/Assignment2_Sem1_2023/Datasets/User Knowledge Modeling Data Set/Data_User.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/venv/Assignment2_Sem1_2023/Datasets/User Knowledge Modeling Data Set/Data_User_test.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/venv/Assignment2_Sem1_2023/__MACOSX/Datasets/Online Shoppers Purchasing Intention Dataset/._online_shoppers_intention.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+        <entry key="/venv/Assignment2_Sem1_2023/__MACOSX/Datasets/Turkish Music Emotion Dataset Data Set/._Acoustic Features.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value=";" />
+            </Attribute>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
