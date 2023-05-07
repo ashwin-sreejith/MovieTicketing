@@ -6,8 +6,13 @@ class Ticket:
         self._ticket_name = ticket_name
         self._ticket_price = ticket_price
 
-    def get_ticket_price(self):
+    @property
+    def ticket_price(self):
         return self._ticket_price
+
+    @ticket_price.setter
+    def ticket_price(self, ticket_price):
+        self._ticket_price = ticket_price
 
     def display_info(self):
         print(f"Ticket ID : {self._ticket_id}\n" + f"Ticket Name : {self._ticket_name}\n" +

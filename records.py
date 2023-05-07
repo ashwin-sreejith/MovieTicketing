@@ -41,7 +41,7 @@ class Records:
         """Instantiates RewardStepCustomers"""
         reward_step_customer = RewardStepCustomer(customer_data[0], customer_data[1])
         self._existing_customers.append(reward_step_customer)
-        reward_step_customer.set_discount_rate(customer_data[2])
+        reward_step_customer.discount_rate = customer_data[2]
         reward_step_customer.set_threshold(customer_data[3])
 
     def load_reward_flat_customer(self, customer_data: list):
@@ -90,7 +90,6 @@ class Records:
                   "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
         finally:
             print("Finished reading ticket data!")
-            # self.temp_print(self._existing_ticket_types)
 
     def load_tickets(self, ticket_data: list):
         """Instantiates ticket-types"""

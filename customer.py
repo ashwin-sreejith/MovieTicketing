@@ -1,5 +1,4 @@
 
-
 class Customer:
     """ Customer parent class, handles all customer-centric computing"""
 
@@ -14,25 +13,31 @@ class Customer:
     def _set_name(self, name):
         self._customer_name = name.upper().strip()
 
-    # Getter method for customer name
-    def get_customer_name(self):
+    @property
+    def customer_name(self):
         return self._customer_name
 
-    # Getter method for customer ID
-    def get_customer_id(self):
+    @customer_name.setter
+    def customer_name(self, customer_name):
+        self._customer_name = customer_name.name.upper().strip()
+
+    @property
+    def customer_id(self):
         return self._customer_id
 
+    @customer_id.setter
+    def customer_id(self, customer_id):
+        self._customer_id = customer_id
+
     # calculates discount for customer
-    def get_discount(self, cost):
+    def get_discount(self, cost: float):
         return 0
 
     # calculates booking fee for customer
-    def get_booking_fee(self, ticket_quantity):
+    @staticmethod
+    def get_booking_fee(ticket_quantity: int):
         return 2 * ticket_quantity
 
     # displays customer information
     def display_info(self):
         print(f"Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, Discount : 0")
-
-
-
