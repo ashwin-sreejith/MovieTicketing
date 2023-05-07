@@ -19,7 +19,7 @@ class Customer:
 
     @customer_name.setter
     def customer_name(self, customer_name):
-        self._customer_name = customer_name.name.upper().strip()
+        self._customer_name = customer_name.upper().strip()
 
     @property
     def customer_id(self):
