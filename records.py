@@ -23,7 +23,7 @@ class Records:
                 line = customer_file.readline()
                 while line:
                     customer_data = line.strip().split(',')
-                    customer_data = [entry for entry in customer_data if entry != ""]
+                    customer_data = [entry.strip() for entry in customer_data if entry != ""]
                     if len(customer_data) > 3:
                         self.load_reward_step_customer(customer_data)
                     elif len(customer_data) > 2:
@@ -62,7 +62,7 @@ class Records:
                 line = movie_file.readline()
                 while line:
                     movie_data = line.strip().split(',')
-                    movie_data = [entry for entry in movie_data if entry != ""]
+                    movie_data = [entry.strip() for entry in movie_data if entry != ""]
                     self.load_movies(movie_data)
                     line = movie_file.readline()
         except FileNotFoundError:
@@ -82,7 +82,7 @@ class Records:
                 line = ticket_file.readline()
                 while line:
                     ticket_data = line.strip().split(',')
-                    ticket_data = [entry for entry in ticket_data if entry != ""]
+                    ticket_data = [entry.strip() for entry in ticket_data if entry != ""]
                     self.load_tickets(ticket_data)
                     line = ticket_file.readline()
         except FileNotFoundError:
@@ -96,6 +96,23 @@ class Records:
         ticket = Ticket(ticket_data[0], ticket_data[1], ticket_data[2])
         self._existing_ticket_types.append(ticket)
 
-    # def temp_print(self, list):
-    #     for item in list:
-    #         item.display_info()
+    def find_customer(self, query):
+        """ Search for customer in existing customers"""
+        for item in self._existing_customers:
+            if query.upper() == item.customer_name or query.upper() == item.customer_id.upper():
+                return item
+        return None
+
+    def find_movie(self, query):
+        """ Search for customer in existing customers"""
+        for item in self._existing_movies:
+            if query.upper() == item.movie_name.upper() or query.upper() == item.movie_id.upper():
+                return item
+        return None
+
+    def find_ticket(self, query):
+        """ Search for customer in existing customers"""
+        for item in self._existing_ticket_types:
+            if query.upper() == item.ticket_name.upper() or query.upper() == item.ticket_id.upper():
+                return item
+        return None
