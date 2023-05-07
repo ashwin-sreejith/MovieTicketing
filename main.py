@@ -10,13 +10,13 @@ from records import Records
 # print(customer1.get_customer_id())
 # print(customer1.get_customer_name())
 # customer1.display_info()
-#
-customer2 = RewardFlatCustomer(18, 'Mouni')
-print(customer2.get_discount(25))
-print(customer2.get_discount(65))
-print(customer2.customer_id)
-print(customer2.customer_name)
-customer2.display_info()
+# #
+# customer2 = RewardFlatCustomer(18, 'Mouni')
+# print(customer2.get_discount(25))
+# print(customer2.get_discount(65))
+# print(customer2.customer_id)
+# print(customer2.customer_name)
+# customer2.display_info()
 
 #
 # customer3 = RewardStepCustomer(3, 'Achu')
@@ -32,3 +32,4 @@ customer2.display_info()
 # print(booking1.compute_cost())
 
 record1 = Records()
+print(record1.find_ticket('child').ticket_id)
