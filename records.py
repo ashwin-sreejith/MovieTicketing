@@ -16,6 +16,7 @@ class Records:
         self.read_movies()
         self.read_tickets()
 
+    # Reads customers from file and calls the respective load function to load into list
     def read_customer(self):
         """Loads the customer data from file and appends to list of existing customers"""
         try:
@@ -36,7 +37,9 @@ class Records:
                   "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
         finally:
             print("Finished reading customer data!")
+            self.display_customers()
 
+    # Loads reward step customers
     def load_reward_step_customer(self, customer_data: list):
         """Instantiates RewardStepCustomers"""
         reward_step_customer = RewardStepCustomer(customer_data[0], customer_data[1])
@@ -44,17 +47,20 @@ class Records:
         reward_step_customer.discount_rate = customer_data[2]
         reward_step_customer.set_threshold(customer_data[3])
 
+    # Loads reward flat customers
     def load_reward_flat_customer(self, customer_data: list):
         """Instantiates RewardFlatCustomers"""
         reward_flat_customer = RewardFlatCustomer(customer_data[0], customer_data[1])
         self._existing_customers.append(reward_flat_customer)
         reward_flat_customer.set_discount_rate(customer_data[2])
 
+    # Loads normal customers
     def load_customer(self, customer_data: list):
         """Instantiates Normal Customers"""
         customer = Customer(customer_data[0], customer_data[1])
         self._existing_customers.append(customer)
 
+    # Reads movie from file and calls the load function to load into a list
     def read_movies(self):
         """Loads the movies from file and appends to list of existing movies"""
         try:
@@ -70,12 +76,15 @@ class Records:
                   "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
         finally:
             print("Finished reading movie data!")
+            self.display_movie()
 
+    # Loads movies
     def load_movies(self, movie_data: list):
         """Instantiates movies"""
         movie = Movie(movie_data[0], movie_data[1], movie_data[2])
         self._existing_movies.append(movie)
 
+    # Reads tickets from file and calls the load function to load into a list
     def read_tickets(self):
         try:
             with open('./COSC2531_Assignment2_txtfiles/tickets.txt', 'r') as ticket_file:
@@ -90,12 +99,15 @@ class Records:
                   "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
         finally:
             print("Finished reading ticket data!")
+            self.display_ticket()
 
+    # Loads tickets
     def load_tickets(self, ticket_data: list):
         """Instantiates ticket-types"""
         ticket = Ticket(ticket_data[0], ticket_data[1], ticket_data[2])
         self._existing_ticket_types.append(ticket)
 
+    # Search method for customers
     def find_customer(self, query):
         """ Search for customer in existing customers"""
         for item in self._existing_customers:
@@ -103,6 +115,7 @@ class Records:
                 return item
         return None
 
+    # Search method for movie
     def find_movie(self, query):
         """ Search for customer in existing customers"""
         for item in self._existing_movies:
@@ -110,9 +123,25 @@ class Records:
                 return item
         return None
 
+    # Search method for ticket types
     def find_ticket(self, query):
         """ Search for customer in existing customers"""
         for item in self._existing_ticket_types:
             if query.upper() == item.ticket_name.upper() or query.upper() == item.ticket_id.upper():
                 return item
         return None
+
+    # Displays all existing customers by invoking their respective display methods
+    def display_customers(self):
+        for customer in self._existing_customers:
+            customer.display_info()
+
+    # Displays all existing movie by invoking their respective display methods
+    def display_movie(self):
+        for movie in self._existing_movies:
+            movie.display_info()
+
+    # Displays all existing ticket types by invoking their respective display methods
+    def display_ticket(self):
+        for ticket in self._existing_ticket_types:
+            ticket.display_info()
