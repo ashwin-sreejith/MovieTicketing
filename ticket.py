@@ -28,7 +28,7 @@ class Ticket:
 
     @ticket_price.setter
     def ticket_price(self, ticket_price):
-        self._ticket_price = ticket_price
+        self._ticket_price = float(ticket_price)
 
     def display_info(self):
         print(f"Ticket ID : {self._ticket_id}\n" + f"Ticket Name : {self._ticket_name}\n" +
