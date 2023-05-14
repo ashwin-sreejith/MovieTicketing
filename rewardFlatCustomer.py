@@ -20,7 +20,7 @@ class RewardFlatCustomer(Customer):
     # setter method for discount rate
     @staticmethod
     def set_discount_rate(discount_rate: float):
-        RewardFlatCustomer._DISCOUNT_RATE = discount_rate
+        RewardFlatCustomer._DISCOUNT_RATE = float(discount_rate)
 
     # overrides similar function of parent to calculate discount as 20% of cost
     def get_discount(self, cost: float):
