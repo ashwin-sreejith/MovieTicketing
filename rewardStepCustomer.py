@@ -10,7 +10,7 @@ class RewardStepCustomer(Customer):
     def __init__(self, customer_id, customer_name):
         # Invokes parent constructor
         super().__init__(customer_id, customer_name)
-        self._discount_rate = 0.3
+        self.discount_rate = 0.3
         self._discount = 0
 
     # getter for discount rate
@@ -41,3 +41,6 @@ class RewardStepCustomer(Customer):
         print(f"Step rewards Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, " +
               f"Discount rate : {self._discount_rate}, " + f"Threshold : {RewardStepCustomer._THRESHOLD}, " +
               f"Availed Discount : {self._discount}")
+
+    def to_string(self):
+        return f"{self.customer_id}, {self.customer_name}, {self.discount_rate}, {RewardStepCustomer._THRESHOLD}"

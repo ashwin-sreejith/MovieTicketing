@@ -32,13 +32,5 @@ class RewardFlatCustomer(Customer):
         print(f"Flat rewards Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, " +
               f"Discount rate : {RewardFlatCustomer._DISCOUNT_RATE}, " + f"Availed Discount : {self._discount}")
 
-    # Other getter methods for customer name and ID are not overridden in this class as there is no modifications to be
-    # made to those functions. Since the child already inherits those functions from the parent, they can be accessed
-    # using the child object
-    # If needed the following implementations can be done :
-    #
-    #     def get_customer_name(self):
-    #         return super().get_customer_name()
-    #
-    #     def get_customer_id(self):
-    #         return super().get_customer_id()
+    def to_string(self):
+        return f"{self.customer_id}, {self.customer_name}, {RewardFlatCustomer._DISCOUNT_RATE}"
