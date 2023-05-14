@@ -2,9 +2,9 @@ class Ticket:
     """Class to handle tickets"""
 
     def __init__(self, ticket_id, ticket_name, ticket_price):
-        self._ticket_id = ticket_id
-        self._ticket_name = ticket_name
-        self._ticket_price = ticket_price
+        self.ticket_id = ticket_id
+        self.ticket_name = ticket_name
+        self.ticket_price = ticket_price
 
     @property
     def ticket_name(self):
