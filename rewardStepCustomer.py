@@ -20,7 +20,7 @@ class RewardStepCustomer(Customer):
 
     @discount_rate.setter
     def discount_rate(self, discount_rate: float):
-        self._discount_rate = discount_rate
+        self._discount_rate = float(discount_rate)
 
     # getter for current threshold
     @staticmethod
@@ -30,7 +30,7 @@ class RewardStepCustomer(Customer):
     # setter for threshold value
     @staticmethod
     def set_threshold(threshold: float):
-        RewardStepCustomer._THRESHOLD = threshold
+        RewardStepCustomer._THRESHOLD = float(threshold)
 
     # Calculates discount as per cost of purchase
     def get_discount(self, cost: float):
