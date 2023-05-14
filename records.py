@@ -9,24 +9,39 @@ class Records:
     """Class to handle database"""
 
     def __init__(self):
-        self._existing_customers = []
-        self._existing_movies = []
-        self._existing_ticket_types = []
+        self.existing_customers = []
+        self.existing_movies = []
+        self.existing_ticket_types = []
         self.read_customer()
         self.read_movies()
         self.read_tickets()
 
     @property
     def existing_customers(self):
-        return self._existing_customers
+        return self._existing_customers.copy()
+
+    @existing_customers.setter
+    def existing_customers(self, customers):
+        self._existing_customers = customers
 
     @property
     def existing_movies(self):
-        return self._existing_movies
+        return self._existing_movies.copy()
+
+    @existing_movies.setter
+    def existing_movies(self, movies):
+        self._existing_movies = movies
 
     @property
     def existing_ticket_types(self):
-        return self._existing_ticket_types
+        return self._existing_ticket_types.copy()
+
+    @existing_ticket_types.setter
+    def existing_ticket_types(self, tickets):
+        self._existing_ticket_types = tickets
+
+    def add_to_customers(self, customer):
+        self._existing_customers.append(customer)
 
     # Modify customer to be taken based on S C or F and not len
     # Reads customers from file and calls the respective load function to load into list
@@ -58,14 +73,14 @@ class Records:
         reward_step_customer = RewardStepCustomer(customer_data[0], customer_data[1])
         self._existing_customers.append(reward_step_customer)
         reward_step_customer.discount_rate = customer_data[2]
-        reward_step_customer.set_threshold(customer_data[3])
+        RewardStepCustomer.set_threshold(customer_data[3])
 
     # Loads reward flat customers
     def load_reward_flat_customer(self, customer_data: list):
         """Instantiates RewardFlatCustomers"""
         reward_flat_customer = RewardFlatCustomer(customer_data[0], customer_data[1])
         self._existing_customers.append(reward_flat_customer)
-        reward_flat_customer.set_discount_rate(customer_data[2])
+        RewardFlatCustomer.set_discount_rate(customer_data[2])
 
     # Loads normal customers
     def load_customer(self, customer_data: list):
