@@ -2,9 +2,9 @@ class Movie:
     """Class to handle movie entries"""
 
     def __init__(self, movie_id, movie_name, seats_available):
-        self._movie_id = movie_id
-        self._movie_name = movie_name
-        self._seats_available = seats_available
+        self.movie_id = movie_id
+        self.movie_name = movie_name
+        self.seats_available = seats_available
 
     @property
     def movie_name(self):
@@ -27,8 +27,8 @@ class Movie:
         return self._seats_available
 
     @seats_available.setter
-    def seats_available(self, seats):
-        self._seats_available = seats
+    def seats_available(self, seats: int):
+        self._seats_available = int(seats)
 
     def display_info(self):
         print(f"Movie ID : {self._movie_id}\n" + f"Movie Name : {self._movie_name}\n" +
