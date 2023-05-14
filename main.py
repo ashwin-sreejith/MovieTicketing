@@ -5,8 +5,10 @@ from movie import Movie
 from ticket import Ticket
 from booking import Booking
 from records import Records
+from operations import Operations
 
 # customer1 = Customer(4, 'Ash')
+# customer1.customer_name = "hello"
 # print(customer1.get_customer_id())
 # print(customer1.get_customer_name())
 # customer1.display_info()
@@ -31,5 +33,7 @@ from records import Records
 # booking1 = Booking(customer2, movie1, ticket1, 2)
 # print(booking1.compute_cost())
 
-record1 = Records()
-print(record1.find_ticket('child').ticket_id)
+# record1 = Records()
+# print(record1.find_ticket('child').ticket_id)
+
+op = Operations()
