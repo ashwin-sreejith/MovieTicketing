@@ -16,11 +16,24 @@ class Records:
         self.read_movies()
         self.read_tickets()
 
+    @property
+    def existing_customers(self):
+        return self._existing_customers
+
+    @property
+    def existing_movies(self):
+        return self._existing_movies
+
+    @property
+    def existing_ticket_types(self):
+        return self._existing_ticket_types
+
+    # Modify customer to be taken based on S C or F and not len
     # Reads customers from file and calls the respective load function to load into list
     def read_customer(self):
         """Loads the customer data from file and appends to list of existing customers"""
         try:
-            with open('./COSC2531_Assignment2_txtfiles/customers.txt', 'r') as customer_file:
+            with open('customers.txt', 'r') as customer_file:
                 line = customer_file.readline()
                 while line:
                     customer_data = line.strip().split(',')
@@ -34,10 +47,10 @@ class Records:
                     line = customer_file.readline()
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
-                  "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
+                  "the current working directory.")
         finally:
             print("Finished reading customer data!")
-            self.display_customers()
+            # self.display_customers()
 
     # Loads reward step customers
     def load_reward_step_customer(self, customer_data: list):
@@ -64,7 +77,7 @@ class Records:
     def read_movies(self):
         """Loads the movies from file and appends to list of existing movies"""
         try:
-            with open('./COSC2531_Assignment2_txtfiles/movies.txt', 'r') as movie_file:
+            with open('movies.txt', 'r') as movie_file:
                 line = movie_file.readline()
                 while line:
                     movie_data = line.strip().split(',')
@@ -73,10 +86,10 @@ class Records:
                     line = movie_file.readline()
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
-                  "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
+                  "the current working directory.")
         finally:
             print("Finished reading movie data!")
-            self.display_movie()
+            # self.display_movie()
 
     # Loads movies
     def load_movies(self, movie_data: list):
@@ -87,7 +100,7 @@ class Records:
     # Reads tickets from file and calls the load function to load into a list
     def read_tickets(self):
         try:
-            with open('./COSC2531_Assignment2_txtfiles/tickets.txt', 'r') as ticket_file:
+            with open('tickets.txt', 'r') as ticket_file:
                 line = ticket_file.readline()
                 while line:
                     ticket_data = line.strip().split(',')
@@ -96,10 +109,10 @@ class Records:
                     line = ticket_file.readline()
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
-                  "'COSC2531_Assignment2_txtfiles' folder in the current working directory.")
+                  "the current working directory.")
         finally:
             print("Finished reading ticket data!")
-            self.display_ticket()
+            # self.display_ticket()
 
     # Loads tickets
     def load_tickets(self, ticket_data: list):
@@ -108,7 +121,7 @@ class Records:
         self._existing_ticket_types.append(ticket)
 
     # Search method for customers
-    def find_customer(self, query):
+    def find_customer(self, query: str):
         """ Search for customer in existing customers"""
         for item in self._existing_customers:
             if query.upper() == item.customer_name or query.upper() == item.customer_id.upper():
@@ -116,7 +129,7 @@ class Records:
         return None
 
     # Search method for movie
-    def find_movie(self, query):
+    def find_movie(self, query: str):
         """ Search for customer in existing customers"""
         for item in self._existing_movies:
             if query.upper() == item.movie_name.upper() or query.upper() == item.movie_id.upper():
@@ -124,7 +137,7 @@ class Records:
         return None
 
     # Search method for ticket types
-    def find_ticket(self, query):
+    def find_ticket(self, query: str):
         """ Search for customer in existing customers"""
         for item in self._existing_ticket_types:
             if query.upper() == item.ticket_name.upper() or query.upper() == item.ticket_id.upper():
