@@ -139,7 +139,7 @@ class Records:
     def find_customer(self, query: str):
         """ Search for customer in existing customers"""
         for item in self._existing_customers:
-            if query.upper() == item.customer_name or query.upper() == item.customer_id.upper():
+            if query.upper() == item.customer_name.upper() or query.upper() == item.customer_id.upper():
                 return item
         return None
 
