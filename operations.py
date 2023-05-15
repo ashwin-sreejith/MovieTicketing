@@ -3,6 +3,7 @@ from customer import Customer
 from rewardFlatCustomer import RewardFlatCustomer
 from rewardStepCustomer import RewardStepCustomer
 from booking import Booking
+from error_handler import *
 
 
 class Operations:
@@ -49,7 +50,7 @@ class Operations:
         customer_name = input("Enter the customer name : ").strip().upper()
         movie_name = Operations.check_movie()
         ticket_type = Operations.check_ticket_type()
-        ticket_quantity = Operations.check_ticket(movie_name)
+        ticket_quantity = Operations.check_ticket_quantity(movie_name)
         customer_name = Operations.check_customer(customer_name)
         book_tickets = Booking(customer_name, movie_name, ticket_type, ticket_quantity)
         cost_data = book_tickets.compute_cost()
@@ -73,15 +74,20 @@ class Operations:
             # Accepts movie name from user
             movie_name = input("Enter the movie name : ").strip()
             is_movie_available = Operations._record.find_movie(movie_name)
-            # Checks if movie entered exists
-            if not is_movie_available:
-                print(f"Sorry! movie {movie_name} not found. Please try again.")
+            try:
+                # Checks if movie entered exists
+                if not is_movie_available:
+                    raise MovieNotFoundError
                 # Checks if the chosen movie has vacant seats
-            elif is_movie_available.seats_available == 0:
+                elif is_movie_available.seats_available == 0:
+                    raise FullyBookedError
+                else:
+                    # returns the movie name back to the caller
+                    return is_movie_available
+            except MovieNotFoundError:
+                print(f"Sorry! movie {movie_name} not found. Please try again.")
+            except FullyBookedError:
                 print(f"Sorry {movie_name} is fully booked. Try a different movie!")
-            else:
-                # returns the movie name back to the caller
-                return is_movie_available
 
     # function to accept ticket type from user
     @staticmethod
@@ -90,10 +96,13 @@ class Operations:
             # Accepts ticket type
             ticket_type = input("Enter a ticket type : ").strip()
             is_ticket_available = Operations._record.find_ticket(ticket_type)
-            if not is_ticket_available:
+            try:
+                if not is_ticket_available:
+                    raise TicketTypeNotFoundError
+                else:
+                    return is_ticket_available
+            except TicketTypeNotFoundError:
                 print(f"Sorry! ticket type {ticket_type} not found.")
-            else:
-                return is_ticket_available
 
     @staticmethod
     def save_to_file(obj, filepath: str = "./COSC2531_Assignment2_txtfiles/"):
@@ -109,15 +118,18 @@ class Operations:
         while is_reward:
             program_code = input("Choose the discount program (F - RewardFlatCustomer, S - RewardStepCustomer) : "). \
                 upper().strip()
-            if program_code == "S":
-                this_customer = RewardStepCustomer(program_code + str(Operations._customer_id_count), customer_name)
-                Operations._customer_id_count += 1
-                break
-            elif program_code == "F":
-                this_customer = RewardFlatCustomer(program_code + str(Operations._customer_id_count), customer_name)
-                Operations._customer_id_count += 1
-                break
-            else:
+            try:
+                if program_code == "S":
+                    this_customer = RewardStepCustomer(program_code + str(Operations._customer_id_count), customer_name)
+                    Operations._customer_id_count += 1
+                    break
+                elif program_code == "F":
+                    this_customer = RewardFlatCustomer(program_code + str(Operations._customer_id_count), customer_name)
+                    Operations._customer_id_count += 1
+                    break
+                else:
+                    raise DiscountProgramChoiceError
+            except DiscountProgramChoiceError:
                 print("Sorry! Please choose between (F - RewardFlatCustomer / S - RewardStepCustomer)")
         if not is_reward:
             this_customer = Customer("C" + str(Operations._customer_id_count), customer_name)
@@ -131,32 +143,37 @@ class Operations:
         while True:
             # Prompts user to enter if customer wishes to join the program
             choice = input("Does the customer want to join the rewards program? (Y - YES, N - NO) : ").upper().strip()
-            # If y or Y is chosen
-            if choice == 'Y':
-                customer = Operations.add_to_program(customer_name, True)
-                return customer
-            elif choice == 'N':
-                customer = Operations.add_to_program(customer_name)
-                return customer
-            else:
-                print("Sorry! Please enter 'Y' for YES and 'N' for NO")
+            try:
+                # If y or Y is chosen
+                if choice == 'Y':
+                    customer = Operations.add_to_program(customer_name, True)
+                    return customer
+                elif choice == 'N':
+                    customer = Operations.add_to_program(customer_name)
+                    return customer
+                else:
+                    raise DiscountChoiceInputError
+            except DiscountChoiceInputError:
+                print("Sorry! Please enter 'Y' for YES or 'N' for NO")
 
     @staticmethod
-    def check_ticket(movie):
+    def check_ticket_quantity(movie):
         while True:
             try:
                 quantity = int(input("Enter the ticket quantity (Enter only whole numbers) : "))
                 if quantity == 0 or quantity < 0:
-                    print("Ticket quantity cannot be zero or negative, please enter a valid number!")
+                    raise InvalidTicketQuantityError
+                elif quantity > movie.seats_available:
+                    raise QuantityExceededError
                 else:
-                    break
+                    movie.seats_available -= quantity
+                    return quantity
             except ValueError:
                 print("Enter a valid number as ticket quantity")
-        if quantity > movie.seats_available:
-            print(f"Sorry! only {movie.seats_available} seats left for {movie.movie_name}")
-        else:
-            movie.seats_available -= quantity
-            return quantity
+            except InvalidTicketQuantityError:
+                print("Ticket quantity cannot be zero or negative, please enter a valid number!")
+            except QuantityExceededError:
+                print(f"Sorry! only {movie.seats_available} seats left for {movie.movie_name}")
 
     @staticmethod
     def show_existing_customers():
@@ -220,5 +237,4 @@ class Operations:
         print("Discount:".ljust(40) + str(round(cost_data[2], 1)).rjust(40))
         print("Booking Fee:".ljust(40) + str(cost_data[1]).rjust(40))
         print("Total Cost:".ljust(40) + str(round(total_cost, 1)).rjust(40))
-
-
+        print()
