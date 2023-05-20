@@ -6,6 +6,7 @@ from ticket import Ticket
 from booking import Booking
 from records import Records
 from operations import Operations
+from group_ticket import GroupTicket
 
 # customer1 = Customer(4, 'Ash')
 # customer1.customer_name = "hello"
@@ -37,3 +38,6 @@ from operations import Operations
 # print(record1.find_ticket('child').ticket_id)
 
 op = Operations()
+
+# gt = GroupTicket("G1", "Family5", "adult", 1, "child", 2)
+
