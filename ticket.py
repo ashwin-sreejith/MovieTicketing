@@ -1,7 +1,7 @@
 class Ticket:
     """Class to handle tickets"""
 
-    def __init__(self, ticket_id, ticket_name, ticket_price):
+    def __init__(self, ticket_id, ticket_name, ticket_price=0.0):
         self.ticket_id = ticket_id
         self.ticket_name = ticket_name
         self.ticket_price = ticket_price
