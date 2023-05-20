@@ -3,6 +3,7 @@ from rewardFlatCustomer import RewardFlatCustomer
 from customer import Customer
 from movie import Movie
 from ticket import Ticket
+from group_ticket import GroupTicket
 
 
 class Records:
@@ -53,9 +54,10 @@ class Records:
                 while line:
                     customer_data = line.strip().split(',')
                     customer_data = [entry.strip() for entry in customer_data if entry != ""]
-                    if len(customer_data) > 3:
+                    customer_code = customer_data[0][0].upper()
+                    if customer_code == 'S':
                         self.load_reward_step_customer(customer_data)
-                    elif len(customer_data) > 2:
+                    elif customer_code == 'F':
                         self.load_reward_flat_customer(customer_data)
                     else:
                         self.load_customer(customer_data)
@@ -120,7 +122,10 @@ class Records:
                 while line:
                     ticket_data = line.strip().split(',')
                     ticket_data = [entry.strip() for entry in ticket_data if entry != ""]
-                    self.load_tickets(ticket_data)
+                    if ticket_data[0][0] == 'T':
+                        self.load_tickets(ticket_data)
+                    else:
+                        self.load_group_tickets(ticket_data)
                     line = ticket_file.readline()
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
@@ -135,7 +140,37 @@ class Records:
         ticket = Ticket(ticket_data[0], ticket_data[1], ticket_data[2])
         self._existing_ticket_types.append(ticket)
 
-    # Search method for customers
+    def load_group_tickets(self, ticket_data: list):
+        """Instantiates group ticket"""
+        if len(ticket_data) % 2 != 0:
+            print(f"Invalid Ticket Entry {', '.join(ticket_data)}")
+        else:
+            try:
+                tickets_dict = {ticket_data[i]: ticket_data[i + 1] for i in
+                                range(2, len(ticket_data), 2)}
+                tickets = {self.find_ticket(ticket): tickets_dict.get(ticket) for ticket in tickets_dict.keys()}
+                computed_cost = Records.calc_grp_price(tickets)
+                if computed_cost > 0:
+                    self._existing_ticket_types.append(GroupTicket(ticket_data[0], ticket_data[1], computed_cost,
+                                                                   ticket=tickets))
+                else:
+                    print("Something wrong with this group ticket!")
+            except TypeError:
+                print("Invalid Group Ticket found!")
+
+    @staticmethod
+    def calc_grp_price(tickets: dict) -> float:
+        """Calculates price for given group ticket"""
+        cost = 0
+        for ticket, quantity in tickets.items():
+            cost += float(ticket.ticket_price) * int(quantity)
+        cost *= 0.8
+        if cost >= 50.0:
+            return round(cost, 1)
+        else:
+            return -1
+
+    # Search method for customer
     def find_customer(self, query: str):
         """ Search for customer in existing customers"""
         for item in self._existing_customers:
