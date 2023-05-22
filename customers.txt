@@ -5,3 +5,5 @@ S5, Florence, 0.4, 50
 F8, Amelia, 0.2
 F10, Leo, 0.2
 C11, Henry
+F12, Appu, 0.2
+S13, Achu, 0.3, 50.0
