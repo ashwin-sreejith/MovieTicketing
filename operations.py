@@ -1,5 +1,6 @@
 from records import Records
 from customer import Customer
+from movie import Movie
 from rewardFlatCustomer import RewardFlatCustomer
 from rewardStepCustomer import RewardStepCustomer
 from booking import Booking
@@ -9,7 +10,6 @@ from error_handler import *
 class Operations:
     """Main class to handle all operations"""
 
-    _customer_id_count: int = 12
     _record = Records()
 
     def __init__(self):
@@ -25,13 +25,17 @@ class Operations:
                   "2: Display existing customers' information\n"
                   "3: Display existing movies' information\n"
                   "4: Display existing ticket types' information\n"
+                  "5: Add movies\n"
+                  "6: Adjust the discount rate of a RewardStep customer\n"
                   "0: Exit the program\n"
                   "####################################################################################"
                   )
             choice_mapping = {1: Operations.purchase_ticket,
                               2: Operations.show_existing_customers,
                               3: Operations.show_existing_movies,
-                              4: Operations.show_existing_ticket_types}
+                              4: Operations.show_existing_ticket_types,
+                              5: Operations.add_movie,
+                              6: Operations.adjust_step_discount_rate}
 
             try:
                 choice = int(input("Choose one option : "))
@@ -120,20 +124,17 @@ class Operations:
                 upper().strip()
             try:
                 if program_code == "S":
-                    this_customer = RewardStepCustomer(program_code + str(Operations._customer_id_count), customer_name)
-                    Operations._customer_id_count += 1
+                    this_customer = RewardStepCustomer(program_code, customer_name)
                     break
                 elif program_code == "F":
-                    this_customer = RewardFlatCustomer(program_code + str(Operations._customer_id_count), customer_name)
-                    Operations._customer_id_count += 1
+                    this_customer = RewardFlatCustomer(program_code, customer_name)
                     break
                 else:
                     raise DiscountProgramChoiceError
             except DiscountProgramChoiceError:
                 print("Sorry! Please choose between (F - RewardFlatCustomer / S - RewardStepCustomer)")
         if not is_reward:
-            this_customer = Customer("C" + str(Operations._customer_id_count), customer_name)
-            Operations._customer_id_count += 1
+            this_customer = Customer("C", customer_name)
         Operations._record.add_to_customers(this_customer)
         Operations.save_to_file(this_customer, 'customers.txt')
         return this_customer
@@ -162,7 +163,7 @@ class Operations:
             try:
                 quantity = int(input("Enter the ticket quantity (Enter only whole numbers) : "))
                 if quantity == 0 or quantity < 0:
-                    raise InvalidTicketQuantityError
+                    raise InvalidQuantityError
                 elif quantity > movie.seats_available:
                     raise QuantityExceededError
                 else:
@@ -170,10 +171,70 @@ class Operations:
                     return quantity
             except ValueError:
                 print("Enter a valid number as ticket quantity")
-            except InvalidTicketQuantityError:
+            except InvalidQuantityError:
                 print("Ticket quantity cannot be zero or negative, please enter a valid number!")
             except QuantityExceededError:
                 print(f"Sorry! only {movie.seats_available} seats left for {movie.movie_name}")
+
+    @staticmethod
+    def add_movie():
+        new_movies = input("Please enter movie names as comma separated names : ").split(',')
+        new_movies = [movie.strip() for movie in new_movies]
+        for movie in new_movies:
+            try:
+                if not movie:
+                    raise InvalidEntryError
+                # available_movie_details updated with only new movies, existing movies are skipped
+                elif Operations._record.find_movie(movie):
+                    print(f"{movie} already exists in the records hence skipped.")
+                else:
+                    this_movie = Movie("M", movie, 50)
+                    Operations._record.add_to_movies(this_movie)
+                    print(f"Movie {movie} added successfully!")
+            except InvalidEntryError:
+                print("Movie entered is empty! Not added")
+        print()
+
+    @staticmethod
+    def adjust_step_discount_rate():
+        customer = ""
+        while True:
+            try:
+                customer = input("Enter the customer ID/Name of the Reward Step Customer : ").strip()
+                customer_obj = Operations._record.find_customer(customer)
+                if not customer:
+                    raise InvalidEntryError
+                elif not customer_obj:
+                    raise CustomerNotFoundError
+                elif not isinstance(customer_obj, RewardStepCustomer):
+                    raise NotStepInstanceError
+                else:
+                    disc_rate = Operations.__accept_disc_rate(customer_obj)
+                    print(f"Discount Rate for {customer} modified to {disc_rate} successfully!")
+                    break
+            except InvalidEntryError:
+                print("No value entered!")
+            except CustomerNotFoundError:
+                print(f"{customer} is not customer!")
+            except NotStepInstanceError:
+                print(f"{customer} is not a Reward Step customer!")
+            except AttributeError:
+                print("No name or ID entered!")
+
+    @staticmethod
+    def __accept_disc_rate(customer_obj):
+        while True:
+            try:
+                new_disc_rate = float(input("Enter the new discount rate : "))
+                if new_disc_rate <= 0 or new_disc_rate >= 1:
+                    raise InvalidQuantityError
+                else:
+                    customer_obj.discount_rate = new_disc_rate
+                    return new_disc_rate
+            except ValueError:
+                print("Enter a valid discount rate! (Eg : 0.2) ")
+            except InvalidQuantityError:
+                print("Discount rate cannot be zero, negative or greater than or equal to 1!")
 
     @staticmethod
     def show_existing_customers():
@@ -184,7 +245,7 @@ class Operations:
         print("Customer Database".center(200))
         print("-" * 205)
         print("Rewards Program".center(40) + "|" + "Customer ID".center(40) + "|" + "Customer Name".center(40) + "|" +
-              "Discount Rate".center(40) + "|" + "Threshold Rate".center(40))
+              "Discount Rate".center(40) + "|" + "Threshold Rate".center(40) + "|")
         print("-" * 205)
         for customer in Operations._record.existing_customers:
             customer_data = customer.to_string().split(',')
