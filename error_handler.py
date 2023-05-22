@@ -3,8 +3,23 @@ class Error(Exception):
     pass
 
 
+class CustomerNotFoundError(Error):
+    """Exception to be raised when customer not a Step customer"""
+    pass
+
+
+class NotStepInstanceError(Error):
+    """Exception to be raised when customer not a Step customer"""
+    pass
+
+
 class MovieNotFoundError(Error):
     """Exception to be raised when movie not in existing list"""
+    pass
+
+
+class InvalidEntryError(Error):
+    """Exception to be raised when entry is null/invalid"""
     pass
 
 
@@ -27,7 +42,7 @@ class DiscountProgramChoiceError(Error):
     pass
 
 
-class InvalidTicketQuantityError(Error):
+class InvalidQuantityError(Error):
     """Exception to be raised if the ticket quantity entered is negative or 0"""
     pass
 
@@ -35,5 +50,3 @@ class InvalidTicketQuantityError(Error):
 class QuantityExceededError(Error):
     """Exception to be raised if the ticket quantity requested exceeds available seats"""
     pass
-
-
