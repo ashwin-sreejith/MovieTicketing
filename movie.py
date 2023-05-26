@@ -7,6 +7,8 @@ class Movie:
         self.movie_id = movie_id
         self.movie_name = movie_name
         self.seats_available = seats_available
+        self._revenue = 0
+        self.ticket_details = {}
 
     @property
     def movie_name(self):
@@ -43,6 +45,30 @@ class Movie:
     @staticmethod
     def set_movie_id_count(movie_id_number: int):
         Movie._MOVIE_ID_COUNT = movie_id_number
+
+    @property
+    def revenue(self):
+        return self._revenue
+
+    @revenue.setter
+    def revenue(self, revenue):
+        self._revenue += revenue
+
+    @property
+    def ticket_details(self):
+        return self._ticket_details.copy()
+
+    @ticket_details.setter
+    def ticket_details(self, ticket):
+        self._ticket_details = ticket
+
+    def update_ticket_details(self, ticket):
+        for ticket_entry in ticket:
+            ticket_type, quantity = ticket_entry
+            if ticket_type.ticket_name in self._ticket_details:
+                self._ticket_details[ticket_type.ticket_name] += quantity
+            else:
+                self._ticket_details[ticket_type.ticket_name] = quantity
 
     def display_info(self):
         print(f"Movie ID : {self._movie_id}\n" + f"Movie Name : {self._movie_name}\n" +
