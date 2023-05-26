@@ -15,8 +15,8 @@ class Records:
         self.existing_movies = []
         self.existing_ticket_types = []
         self.read_customer()
-        self.read_movies()
         self.read_tickets()
+        self.read_movies()
 
     @property
     def existing_customers(self):
@@ -124,6 +124,8 @@ class Records:
     def load_movies(self, movie_data: list):
         """Instantiates movies"""
         movie = Movie(movie_data[0], movie_data[1], movie_data[2])
+        movie.ticket_details = {ticket.ticket_name: 0 for ticket in self._existing_ticket_types}
+        print(movie.ticket_details)
         self._existing_movies.append(movie)
 
     # Reads tickets from file and calls the load function to load into a list
@@ -172,7 +174,8 @@ class Records:
             except TypeError:
                 print(f"Invalid Group Ticket found! {', '.join(ticket_data)}")
             except InvalidEntryError:
-                print(f"Something wrong with this group ticket! {', '.join(ticket_data)}")
+                print(f"Group ticket {ticket_data[0]} is not valid! Price of a group ticket needs to be "
+                      f"equal to or higher than 50$")
 
     @staticmethod
     def calc_grp_price(tickets: dict) -> float:
@@ -224,3 +227,16 @@ class Records:
     def display_ticket(self):
         for ticket in self._existing_ticket_types:
             ticket.display_info()
+
+    def most_popular_movie(self):
+        max_revenue = 0
+        popular = ""
+        for movie in self._existing_movies:
+            this_revenue = movie.revenue
+            if this_revenue > max_revenue:
+                max_revenue = this_revenue
+                popular = movie.movie_name
+        if popular:
+            return popular, max_revenue
+        else:
+            return "No tickets bought yet!"
