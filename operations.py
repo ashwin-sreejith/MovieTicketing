@@ -300,12 +300,17 @@ class Operations:
 
     @staticmethod
     def most_popular():
+        print()
         print("--------------------------------------------------------------------------------\n"
               "Most popular Movie\n"
               "--------------------------------------------------------------------------------"
               )
-        movie, revenue = Operations._record.most_popular_movie()
-        print(f"{movie} with total revenue of {revenue}$")
+        result = Operations._record.most_popular_movie()
+        if result:
+            movie, revenue = result
+            print(f"{movie} with total revenue of {revenue}$")
+        else:
+            print("No tickets bought yet!")
         print()
 
     @staticmethod
