@@ -239,4 +239,4 @@ class Records:
         if popular:
             return popular, max_revenue
         else:
-            return "No tickets bought yet!"
+            return None
