@@ -50,3 +50,8 @@ class InvalidQuantityError(Error):
 class QuantityExceededError(Error):
     """Exception to be raised if the ticket quantity requested exceeds available seats"""
     pass
+
+
+class QuantityTicketTypeMatchError(Error):
+    """Exception to be raised if the number of ticket quantities requested doesn't match that of ticket types"""
+    pass
