@@ -27,6 +27,9 @@ class Operations:
                   "4: Display existing ticket types' information\n"
                   "5: Add movies\n"
                   "6: Adjust the discount rate of a RewardStep customer\n"
+                  "7: Adjust the discount rate of all RewardFlat customers\n"
+                  "9: Display the most popular movie\n"
+                  "10: Display all movie records\n"
                   "0: Exit the program\n"
                   "####################################################################################"
                   )
@@ -35,7 +38,10 @@ class Operations:
                               3: Operations.show_existing_movies,
                               4: Operations.show_existing_ticket_types,
                               5: Operations.add_movie,
-                              6: Operations.adjust_step_discount_rate}
+                              6: Operations.adjust_step_discount_rate,
+                              7: Operations.adjust_flat_discount_rate,
+                              9: Operations.most_popular,
+                              10: Operations.disp_movie_records}
 
             try:
                 choice = int(input("Choose one option : "))
@@ -54,12 +60,27 @@ class Operations:
         customer_name = input("Enter the customer name : ").strip().upper()
         movie_name = Operations.check_movie()
         ticket_type = Operations.check_ticket_type()
-        ticket_quantity = Operations.check_ticket_quantity(movie_name)
+        ticket_quantity = Operations.check_ticket_quantity(movie_name, len(ticket_type))
         customer_name = Operations.check_customer(customer_name)
         book_tickets = Booking(customer_name, movie_name, ticket_type, ticket_quantity)
         cost_data = book_tickets.compute_cost()
         final_cost = cost_data[0] + cost_data[1] - cost_data[2]
+        if movie_name:
+            ticket_record = Operations.create_ticket_set(ticket_type, ticket_quantity)
+            movie_name.update_ticket_details(ticket_record)
+            movie_name.revenue = round(final_cost, 1)
+            print(movie_name.ticket_details)
         Operations.show_receipt(customer_name, movie_name, ticket_type, ticket_quantity, cost_data, final_cost)
+
+    @staticmethod
+    def create_ticket_set(booked_tickets, quantities):
+        ticket_quantity_set = []
+        for ticket in Operations._record.existing_ticket_types:
+            if ticket not in booked_tickets:
+                ticket_quantity_set.append((ticket, 0))
+            else:
+                ticket_quantity_set.append((ticket, quantities[booked_tickets.index(ticket)]))
+        return tuple(ticket_quantity_set)
 
     @staticmethod
     def check_customer(customer_name: str):
@@ -93,20 +114,27 @@ class Operations:
             except FullyBookedError:
                 print(f"Sorry {movie_name} is fully booked. Try a different movie!")
 
-    # function to accept ticket type from user
     @staticmethod
     def check_ticket_type():
+        ticket_obj_list = []
         while True:
+            flag = True
             # Accepts ticket type
-            ticket_type = input("Enter a ticket type : ").strip()
-            is_ticket_available = Operations._record.find_ticket(ticket_type)
-            try:
-                if not is_ticket_available:
-                    raise TicketTypeNotFoundError
-                else:
-                    return is_ticket_available
-            except TicketTypeNotFoundError:
-                print(f"Sorry! ticket type {ticket_type} not found.")
+            ticket_type = input("Enter ticket types : ").strip()
+            ticket_list = [ticket.strip() for ticket in ticket_type.split(',')]
+            for ticket in ticket_list:
+                try:
+                    is_ticket_available = Operations._record.find_ticket(ticket)
+                    if not is_ticket_available:
+                        flag = False
+                        ticket_obj_list.clear()
+                        raise TicketTypeNotFoundError
+                    else:
+                        ticket_obj_list.append(is_ticket_available)
+                except TicketTypeNotFoundError:
+                    print(f"Sorry! ticket type {ticket} not found. Please re-enter!")
+            if flag:
+                return ticket_obj_list
 
     @staticmethod
     def save_to_file(obj, filepath: str = "./COSC2531_Assignment2_txtfiles/"):
@@ -135,6 +163,9 @@ class Operations:
                 print("Sorry! Please choose between (F - RewardFlatCustomer / S - RewardStepCustomer)")
         if not is_reward:
             this_customer = Customer("C", customer_name)
+            print(f"Successfully added {customer_name} to storage")
+        else:
+            print(f"Successfully added {customer_name} to rewards program")
         Operations._record.add_to_customers(this_customer)
         Operations.save_to_file(this_customer, 'customers.txt')
         return this_customer
@@ -158,23 +189,36 @@ class Operations:
                 print("Sorry! Please enter 'Y' for YES or 'N' for NO")
 
     @staticmethod
-    def check_ticket_quantity(movie):
+    def check_ticket_quantity(movie, entry_len):
+        quantity_list = []
         while True:
+            flag = True
             try:
-                quantity = int(input("Enter the ticket quantity (Enter only whole numbers) : "))
-                if quantity == 0 or quantity < 0:
-                    raise InvalidQuantityError
-                elif quantity > movie.seats_available:
-                    raise QuantityExceededError
-                else:
-                    movie.seats_available -= quantity
-                    return quantity
+                quantities = input("Enter the ticket quantities for corresponding ticket types in order separated by "
+                                   "commas (Enter only whole numbers) : ")
+                quantity_list = [int(quantity.strip()) for quantity in quantities.split(',')]
+                for quantity in quantity_list:
+                    if len(quantity_list) != entry_len:
+                        flag = False
+                        raise QuantityTicketTypeMatchError
+                    elif quantity == 0 or quantity < 0:
+                        flag = False
+                        raise InvalidQuantityError
+                    elif quantity > movie.seats_available or sum(quantity_list) > movie.seats_available:
+                        flag = False
+                        raise QuantityExceededError
             except ValueError:
+                flag = False
                 print("Enter a valid number as ticket quantity")
             except InvalidQuantityError:
                 print("Ticket quantity cannot be zero or negative, please enter a valid number!")
             except QuantityExceededError:
                 print(f"Sorry! only {movie.seats_available} seats left for {movie.movie_name}")
+            except QuantityTicketTypeMatchError:
+                print(f"You have entered {entry_len} ticket types but {len(quantity_list)} quantities!")
+            if flag:
+                movie.seats_available -= sum(quantity_list)
+                return quantity_list
 
     @staticmethod
     def add_movie():
@@ -189,11 +233,29 @@ class Operations:
                     print(f"{movie} already exists in the records hence skipped.")
                 else:
                     this_movie = Movie("M", movie, 50)
+                    this_movie.ticket_details = {ticket.ticket_name: 0 for ticket in
+                                                 Operations._record.existing_ticket_types}
                     Operations._record.add_to_movies(this_movie)
                     print(f"Movie {movie} added successfully!")
             except InvalidEntryError:
                 print("Movie entered is empty! Not added")
         print()
+
+    @staticmethod
+    def adjust_flat_discount_rate():
+        while True:
+            try:
+                new_disc_rate = float(input("Enter the new discount rate : "))
+                if new_disc_rate <= 0 or new_disc_rate >= 1:
+                    raise InvalidQuantityError
+                else:
+                    RewardFlatCustomer.set_discount_rate(new_disc_rate)
+                    print(f"Discount Rate for all Reward Flat customers modified to {new_disc_rate}.")
+                    return new_disc_rate
+            except ValueError:
+                print("Enter a valid discount rate! (Eg : 0.2) ")
+            except InvalidQuantityError:
+                print("Discount rate cannot be zero, negative or greater than or equal to 1!")
 
     @staticmethod
     def adjust_step_discount_rate():
@@ -209,7 +271,7 @@ class Operations:
                 elif not isinstance(customer_obj, RewardStepCustomer):
                     raise NotStepInstanceError
                 else:
-                    disc_rate = Operations.__accept_disc_rate(customer_obj)
+                    disc_rate = Operations.__accept_step_disc_rate(customer_obj)
                     print(f"Discount Rate for {customer} modified to {disc_rate} successfully!")
                     break
             except InvalidEntryError:
@@ -222,7 +284,7 @@ class Operations:
                 print("No name or ID entered!")
 
     @staticmethod
-    def __accept_disc_rate(customer_obj):
+    def __accept_step_disc_rate(customer_obj):
         while True:
             try:
                 new_disc_rate = float(input("Enter the new discount rate : "))
@@ -235,6 +297,29 @@ class Operations:
                 print("Enter a valid discount rate! (Eg : 0.2) ")
             except InvalidQuantityError:
                 print("Discount rate cannot be zero, negative or greater than or equal to 1!")
+
+    @staticmethod
+    def most_popular():
+        print("--------------------------------------------------------------------------------\n"
+              "Most popular Movie\n"
+              "--------------------------------------------------------------------------------"
+              )
+        movie, revenue = Operations._record.most_popular_movie()
+        print(f"{movie} with total revenue of {revenue}$")
+        print()
+
+    @staticmethod
+    def disp_movie_records():
+        print(" ".ljust(20), end='')
+        for ticket in Operations._record.existing_ticket_types:
+            print(ticket.ticket_name.center(20), end='')
+        print("Revenue".center(20))
+        for movie in Operations._record.existing_movies:
+            print(movie.movie_name.ljust(20), end='')
+            for quantity in movie.ticket_details.values():
+                print(str(quantity).center(20), end='')
+            print(str(movie.revenue).center(20))
+        print()
 
     @staticmethod
     def show_existing_customers():
@@ -285,15 +370,17 @@ class Operations:
         print()
 
     @staticmethod
-    def show_receipt(customer, movie, ticket_type, ticket_quantity: int, cost_data: tuple, total_cost: float):
+    def show_receipt(customer, movie: Movie, ticket_type: list, ticket_quantity: list, cost_data: tuple,
+                     total_cost: float):
         print("--------------------------------------------------------------------------------\n"
               f"Receipt of {customer.customer_name.capitalize()}\n"
               "--------------------------------------------------------------------------------"
               )
         print("Movie:".ljust(40) + movie.movie_name.rjust(40))
-        print("Ticket Type:".ljust(40) + ticket_type.ticket_name.rjust(40))
-        print("Ticket Unit-price:".ljust(40) + str(ticket_type.ticket_price).rjust(40))
-        print("Ticket Quantity:".ljust(40) + str(ticket_quantity).rjust(40))
+        for ticket, quantity in zip(ticket_type, ticket_quantity):
+            print("Ticket Type:".ljust(40) + ticket.ticket_name.rjust(40))
+            print("Ticket Unit-price:".ljust(40) + str(ticket.ticket_price).rjust(40))
+            print("Ticket Quantity:".ljust(40) + str(quantity).rjust(40))
         print("--------------------------------------------------------------------------------")
         print("Discount:".ljust(40) + str(round(cost_data[2], 1)).rjust(40))
         print("Booking Fee:".ljust(40) + str(cost_data[1]).rjust(40))
