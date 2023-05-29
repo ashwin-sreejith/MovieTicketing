@@ -31,5 +31,5 @@ class Ticket:
         self._ticket_price = float(ticket_price)
 
     def display_info(self):
-        print(f"Ticket ID : {self._ticket_id}\n" + f"Ticket Name : {self._ticket_name}\n" +
-              f"Ticket price : {self._ticket_price}")
+        print(self.ticket_id.center(40) + "|" + self.ticket_name.center(40) + "|"
+              + str(self.ticket_price).center(40))
