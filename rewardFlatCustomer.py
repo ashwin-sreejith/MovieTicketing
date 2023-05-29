@@ -29,8 +29,9 @@ class RewardFlatCustomer(Customer):
 
     # overrides display_info method of customer class to print discount rate as well
     def display_info(self):
-        print(f"Flat rewards Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, " +
-              f"Discount rate : {RewardFlatCustomer._DISCOUNT_RATE}, " + f"Availed Discount : {self._discount}")
+        print("Flat Rewards".center(40) + "|" + f"{self.customer_id}".center(40) + "|" +
+              f"{self.customer_name}".center(40) + "|" + f"{RewardFlatCustomer._DISCOUNT_RATE}".center(40) +
+              "|" + "0.0".center(40))
 
     def to_string(self):
         return f"{self.customer_id}, {self.customer_name}, {RewardFlatCustomer._DISCOUNT_RATE}"

@@ -38,9 +38,9 @@ class RewardStepCustomer(Customer):
         return self._discount
 
     def display_info(self):
-        print(f"Step rewards Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, " +
-              f"Discount rate : {self._discount_rate}, " + f"Threshold : {RewardStepCustomer._THRESHOLD}, " +
-              f"Availed Discount : {self._discount}")
+        print("Step Rewards".center(40) + "|" + f"{self.customer_id}".center(40) + "|" +
+              f"{self.customer_name}".center(40) + "|" + f"{self._discount_rate}".center(40) +
+              "|" + f"{RewardStepCustomer._THRESHOLD}".center(40))
 
     def to_string(self):
         return f"{self.customer_id}, {self.customer_name}, {self.discount_rate}, {RewardStepCustomer._THRESHOLD}"

@@ -1,7 +1,7 @@
 class Customer:
     """ Customer parent class, handles all customer-centric computing"""
 
-    _CUSTOMER_ID_COUNT: int = 0
+    __CUSTOMER_ID_COUNT: int = 0
 
     # Constructor to instantiate the objects
     def __init__(self, customer_id, customer_name):
@@ -11,23 +11,23 @@ class Customer:
 
     @property
     def customer_name(self):
-        return self._customer_name
+        return self.__customer_name
 
     @customer_name.setter
     def customer_name(self, customer_name):
-        self._customer_name = customer_name.capitalize().strip()
+        self.__customer_name = customer_name.capitalize().strip()
 
     @property
     def customer_id(self):
-        return self._customer_id
+        return self.__customer_id
 
     @customer_id.setter
     def customer_id(self, customer_id):
         if len(customer_id) > 1:
-            self._customer_id = customer_id
+            self.__customer_id = customer_id
         else:
-            self._customer_id = customer_id + str(Customer._CUSTOMER_ID_COUNT)
-            Customer._CUSTOMER_ID_COUNT += 1
+            self.__customer_id = customer_id + str(Customer.__CUSTOMER_ID_COUNT)
+            Customer.__CUSTOMER_ID_COUNT += 1
 
     # calculates discount for customer
     def get_discount(self, cost: float):
@@ -40,15 +40,16 @@ class Customer:
 
     @staticmethod
     def get_customer_id_count():
-        return Customer._CUSTOMER_ID_COUNT
+        return Customer.__CUSTOMER_ID_COUNT
 
     @staticmethod
     def set_customer_id_count(customer_id_number: int):
-        Customer._CUSTOMER_ID_COUNT = customer_id_number
+        Customer.__CUSTOMER_ID_COUNT = customer_id_number
 
     # displays customer information
     def display_info(self):
-        print(f"Customer ID : {self._customer_id}, " + f"Customer Name : {self._customer_name}, Discount : 0")
+        print("Standard".center(40) + "|" + f"{self.__customer_id}".center(40) + "|" +
+              f"{self.__customer_name}".center(40) + "|" + "0.0".center(40) + "|" + "0.0".center(40))
 
     def to_string(self):
-        return f"{self.customer_id}, {self.customer_name}"
+        return f"{self.__customer_id}, {self.__customer_name}"
