@@ -1,3 +1,5 @@
+import sys
+import os
 from records import Records
 from customer import Customer
 from movie import Movie
@@ -10,10 +12,53 @@ from error_handler import *
 class Operations:
     """Main class to handle all operations"""
 
-    _record = Records()
+    _record = None
+    customer_file = ""
+    movie_file = ""
+    booking_file = ""
 
-    def __init__(self):
-        self.show_menu()
+    @staticmethod
+    def main():
+
+        # Check the number of command line arguments
+        if len(sys.argv) > 5:
+            print("Incorrect arguments provided! Please provide as per format below: ")
+            print("python program.py customer_file movie_file ticket_file [booking_file]")
+            sys.exit(1)
+
+        # Get the file names from command line arguments or use default values
+        Operations.customer_file = sys.argv[1] if len(sys.argv) > 1 else 'customers.txt'
+        Operations.movie_file = sys.argv[2] if len(sys.argv) > 2 else 'movies.txt'
+        ticket_file = sys.argv[3] if len(sys.argv) > 3 else 'tickets.txt'
+        Operations.booking_file = sys.argv[4] if len(sys.argv) > 4 else 'bookings.txt'
+
+        Operations._record = Records()
+
+        # Check if the files exist
+        if not os.path.isfile(Operations.customer_file):
+            print(f"Customer file '{Operations.customer_file}' not found.")
+            sys.exit(1)
+        else:
+            Operations._record.read_customer(Operations.customer_file)
+
+        if not os.path.isfile(ticket_file):
+            print(f"Ticket file '{ticket_file}' not found.")
+            sys.exit(1)
+        else:
+            Operations._record.read_tickets(ticket_file)
+
+        if not os.path.isfile(Operations.movie_file):
+            print(f"Movie file '{Operations.movie_file}' not found.")
+            sys.exit(1)
+        else:
+            Operations._record.read_movies(Operations.movie_file)
+
+        if not os.path.isfile(Operations.booking_file):
+            print(f"Booking file '{Operations.booking_file}' not found. Running without previous bookings.")
+        else:
+            Operations._record.read_bookings(Operations.booking_file)
+
+        Operations.show_menu()
 
     @staticmethod
     def show_menu():
@@ -28,6 +73,7 @@ class Operations:
                   "5: Add movies\n"
                   "6: Adjust the discount rate of a RewardStep customer\n"
                   "7: Adjust the discount rate of all RewardFlat customers\n"
+                  "8: Display all bookings\n"
                   "9: Display the most popular movie\n"
                   "10: Display all movie records\n"
                   "0: Exit the program\n"
@@ -40,15 +86,15 @@ class Operations:
                               5: Operations.add_movie,
                               6: Operations.adjust_step_discount_rate,
                               7: Operations.adjust_flat_discount_rate,
+                              8: Operations.disp_all_bookings,
                               9: Operations.most_popular,
-                              10: Operations.disp_movie_records}
+                              10: Operations.disp_movie_records,
+                              0: Operations.save_and_exit}
 
             try:
                 choice = int(input("Choose one option : "))
                 choice_function = choice_mapping.get(choice)
-                if choice == 0:
-                    break
-                elif choice_function is None:
+                if choice_function is None:
                     print("Invalid choice! Please choose a valid option.")
                 else:
                     choice_function()
@@ -69,7 +115,9 @@ class Operations:
             ticket_record = Operations.create_ticket_set(ticket_type, ticket_quantity)
             movie_name.update_ticket_details(ticket_record)
             movie_name.revenue = round(final_cost, 1)
-            print(movie_name.ticket_details)
+        booking_list = Operations.create_booking(customer_name, movie_name, ticket_type, ticket_quantity,
+                                                 cost_data[2], cost_data[1], final_cost)
+        Operations._record.add_to_bookings(booking_list)
         Operations.show_receipt(customer_name, movie_name, ticket_type, ticket_quantity, cost_data, final_cost)
 
     @staticmethod
@@ -83,12 +131,25 @@ class Operations:
         return tuple(ticket_quantity_set)
 
     @staticmethod
+    def create_booking(customer, movie, tickets, quantity, discount, booking_fee, cost):
+        tickets = [ticket.ticket_name for ticket in tickets]
+        booking_list = [customer.customer_name, movie.movie_name]
+        booking_list += [str(item) for pair in zip(tickets, quantity) for item in pair]
+        booking_list += [str(discount), str(booking_fee), str(cost)]
+        return ', '.join(booking_list)
+
+    @staticmethod
     def check_customer(customer_name: str):
         is_customer_available = Operations._record.find_customer(customer_name)
         if not is_customer_available:
             customer = Operations.add_customer_to_storage(customer_name)
             return customer
         else:
+            customer_type = "STANDARD CUSTOMER"
+            if isinstance(is_customer_available, (RewardStepCustomer, RewardFlatCustomer)):
+                customer_type = type(is_customer_available).__name__.upper()
+            print(customer_type)
+
             return is_customer_available
 
     # function to accept movie name from user
@@ -137,14 +198,6 @@ class Operations:
                 return ticket_obj_list
 
     @staticmethod
-    def save_to_file(obj, filepath: str = "./COSC2531_Assignment2_txtfiles/"):
-        try:
-            with open(filepath, 'a') as file:
-                file.write("\n" + obj.to_string())
-        except FileNotFoundError:
-            print("Error : File not found!")
-
-    @staticmethod
     def add_to_program(customer_name: str, is_reward: bool = False):
         this_customer = None
         while is_reward:
@@ -167,7 +220,6 @@ class Operations:
         else:
             print(f"Successfully added {customer_name} to rewards program")
         Operations._record.add_to_customers(this_customer)
-        Operations.save_to_file(this_customer, 'customers.txt')
         return this_customer
 
     @staticmethod
@@ -299,12 +351,32 @@ class Operations:
                 print("Discount rate cannot be zero, negative or greater than or equal to 1!")
 
     @staticmethod
+    def disp_all_bookings():
+        print("-" * 266)
+        print("Booking Database".center(266))
+        print("-" * 266)
+        print("Customer Name".center(40) + "|" + "Movie Name".center(40) + "|" + "Tickets & Quantity".center(60) + "|" +
+              "Discount Availed".center(40) + "|" + "Booking Fee".center(40) + "|" + "Total Cost".center(40))
+        print("-" * 266)
+        for entry in Operations._record.existing_bookings:
+            booking_details = entry.split(',')
+            customer = Operations._record.find_customer(booking_details[0].strip()).customer_name
+            movie = Operations._record.find_movie(booking_details[1].strip()).movie_name
+            tickets = booking_details[2:-3]
+            tickets = {tickets[i].strip(): tickets[i + 1].strip() for i in range(0, len(tickets), 2)}
+            discount = booking_details[-3]
+            booking_fee = booking_details[-2]
+            total_cost = booking_details[-1]
+            print(customer.center(40) + "|" + movie.center(40) + "|" + str(tickets).center(60) + "|" +
+                  str(discount).center(40) + "|" + str(booking_fee).center(40) + "|" + str(total_cost).center(40))
+        print()
+
+    @staticmethod
     def most_popular():
         print()
-        print("--------------------------------------------------------------------------------\n"
-              "Most popular Movie\n"
-              "--------------------------------------------------------------------------------"
-              )
+        print("-" * 80)
+        print("Most popular Movie".center(80))
+        print("-" * 80)
         result = Operations._record.most_popular_movie()
         if result:
             movie, revenue = result
@@ -335,19 +407,10 @@ class Operations:
         print("Customer Database".center(200))
         print("-" * 205)
         print("Rewards Program".center(40) + "|" + "Customer ID".center(40) + "|" + "Customer Name".center(40) + "|" +
-              "Discount Rate".center(40) + "|" + "Threshold Rate".center(40) + "|")
+              "Discount Rate".center(40) + "|" + "Threshold Rate".center(40))
         print("-" * 205)
         for customer in Operations._record.existing_customers:
-            customer_data = customer.to_string().split(',')
-            reward_program = id_mapping.get(customer_data[0][0])
-            if reward_program == "Standard":
-                customer_data += [0, 0]
-            elif reward_program == "Flat Rewards":
-                customer_data += [0]
-            print(reward_program.center(40), end="|")
-            for index in range(len(customer_data)):
-                print(str(customer_data[index]).center(40), end="|")
-            print()
+            customer.display_info()
         print()
 
     @staticmethod
@@ -358,8 +421,7 @@ class Operations:
         print("Movie ID".center(40) + "|" + "Movie Name".center(40) + "|" + "Available Seats".center(40))
         print("-" * 120)
         for movie in Operations._record.existing_movies:
-            print(movie.movie_id.center(40) + "|" + movie.movie_name.center(40) + "|"
-                  + str(movie.seats_available).center(40))
+            movie.display_info()
         print()
 
     @staticmethod
@@ -370,8 +432,7 @@ class Operations:
         print("Ticket ID".center(40) + "|" + "Ticket Type".center(40) + "|" + "Ticket price".center(40))
         print("-" * 120)
         for ticket in Operations._record.existing_ticket_types:
-            print(ticket.ticket_id.center(40) + "|" + ticket.ticket_name.center(40) + "|"
-                  + str(ticket.ticket_price).center(40))
+            ticket.display_info()
         print()
 
     @staticmethod
@@ -391,3 +452,43 @@ class Operations:
         print("Booking Fee:".ljust(40) + str(cost_data[1]).rjust(40))
         print("Total Cost:".ljust(40) + str(round(total_cost, 1)).rjust(40))
         print()
+
+    @staticmethod
+    def save_and_exit():
+        Operations.save_to_customer_file(Operations._record.existing_customers, Operations.customer_file)
+        Operations.save_to_booking_file(Operations._record.existing_bookings, Operations.booking_file)
+        Operations.save_to_movie_file(Operations._record.existing_movies, Operations.movie_file)
+        print("***************************** THANK YOU *****************************")
+        sys.exit(0)
+
+    @staticmethod
+    def save_to_customer_file(customers, filepath: str = "./customers.txt"):
+        try:
+            with open(filepath, 'w') as file:
+                for customer in customers:
+                    file.write(customer.to_string() + "\n")
+        except FileNotFoundError:
+            print("Error : File not found!")
+
+    @staticmethod
+    def save_to_movie_file(movies: list, filepath: str = "./movies.txt"):
+        try:
+            with open(filepath, 'w') as file:
+                for movie in movies:
+                    file.write(movie.to_string() + "\n")
+        except FileNotFoundError:
+            print("Error : File not found!")
+
+    @staticmethod
+    def save_to_booking_file(bookings, filepath: str = "./bookings.txt"):
+        try:
+            with open(filepath, 'w') as file:
+                for booking in bookings:
+                    file.write(booking + "\n")
+        except FileNotFoundError:
+            print("Error : File not found!")
+
+
+if __name__ == '__main__':
+    operations = Operations()
+    operations.main()
