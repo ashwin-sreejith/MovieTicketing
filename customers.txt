@@ -1,8 +1,10 @@
 C1, Olivia
-C2, Noah,
-S3, George, 0.3, 50
-S5, Florence, 0.4, 50
+C2, Noah
+S3, George, 0.3, 50.0
+S5, Florence, 0.4, 50.0
 F8, Amelia, 0.2
 F10, Leo, 0.2
 C11, Henry
 C12, F5
+F13, Appu, 0.2
+S14, Achu, 0.3, 50.0
