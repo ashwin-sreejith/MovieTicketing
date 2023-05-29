@@ -1,0 +1,8 @@
+Olivia, Avatar, adult, 2, student, 2, 0.0, 8.0, 99.0
+George, M3, Family4, 1, 21.36, 2.0, 51.84
+F10, Titanic, student, 2, 8.2, 4.0, 36.8
+Amelia, Superman, G9, 1, 16.0, 2.0, 66.0
+S5, M2, senior, 3, concession, 1, 28.6, 8, 50.9
+Appu, Avatar, adult, 2, 10.0, 4, 44.0
+Achu, Avatar, adult, 1, child, 2, concession, 3, student, 4, 62.25, 20, 165.25
+Henry, Avatar, adult, 1, child, 2, 0, 6, 70.0
