@@ -71,5 +71,8 @@ class Movie:
                 self._ticket_details[ticket_type.ticket_name] = quantity
 
     def display_info(self):
-        print(f"Movie ID : {self._movie_id}\n" + f"Movie Name : {self._movie_name}\n" +
-              f"Seats available : {self._seats_available}")
+        print(self.movie_id.center(40) + "|" + self.movie_name.center(40) + "|"
+              + str(self.seats_available).center(40))
+
+    def to_string(self):
+        return f"{self._movie_id}, {self._movie_name}, {self._seats_available}"
