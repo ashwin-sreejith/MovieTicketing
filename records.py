@@ -14,9 +14,7 @@ class Records:
         self.existing_customers = []
         self.existing_movies = []
         self.existing_ticket_types = []
-        self.read_customer()
-        self.read_tickets()
-        self.read_movies()
+        self.existing_bookings = []
 
     @property
     def existing_customers(self):
@@ -48,12 +46,23 @@ class Records:
     def add_to_movies(self, movie):
         self._existing_movies.append(movie)
 
+    def add_to_bookings(self, booking):
+        self._existing_bookings.append(booking)
+
+    @property
+    def existing_bookings(self):
+        return self._existing_bookings.copy()
+
+    @existing_bookings.setter
+    def existing_bookings(self, booking):
+        self._existing_bookings = booking
+
     # Modify customer to be taken based on S C or F and not len
     # Reads customers from file and calls the respective load function to load into list
-    def read_customer(self):
+    def read_customer(self, file_name):
         """Loads the customer data from file and appends to list of existing customers"""
         try:
-            with open('customers.txt', 'r') as customer_file:
+            with open(file_name, 'r') as customer_file:
                 line = customer_file.readline()
                 while line:
                     customer_data = line.strip().split(',')
@@ -67,8 +76,6 @@ class Records:
                         self.load_customer(customer_data)
                     customer_id_number = int(customer_data[0][1:]) + 1
                     line = customer_file.readline()
-                else:
-                    print("Finished reading customer file without errors")
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
                   "the current working directory.")
@@ -100,10 +107,10 @@ class Records:
         self._existing_customers.append(customer)
 
     # Reads movie from file and calls the load function to load into a list
-    def read_movies(self):
+    def read_movies(self, file_name):
         """Loads the movies from file and appends to list of existing movies"""
         try:
-            with open('movies.txt', 'r') as movie_file:
+            with open(file_name, 'r') as movie_file:
                 line = movie_file.readline()
                 while line:
                     movie_data = line.strip().split(',')
@@ -111,27 +118,23 @@ class Records:
                     self.load_movies(movie_data)
                     movie_id_number = int(movie_data[0][1:]) + 1
                     line = movie_file.readline()
-                else:
-                    print("Finished reading movie file without errors")
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
                   "the current working directory.")
         finally:
             Movie.set_movie_id_count(movie_id_number)
-            # self.display_movie()
 
     # Loads movies
     def load_movies(self, movie_data: list):
         """Instantiates movies"""
         movie = Movie(movie_data[0], movie_data[1], movie_data[2])
         movie.ticket_details = {ticket.ticket_name: 0 for ticket in self._existing_ticket_types}
-        print(movie.ticket_details)
         self._existing_movies.append(movie)
 
     # Reads tickets from file and calls the load function to load into a list
-    def read_tickets(self):
+    def read_tickets(self, file_name):
         try:
-            with open('tickets.txt', 'r') as ticket_file:
+            with open(file_name, 'r') as ticket_file:
                 line = ticket_file.readline()
                 while line:
                     ticket_data = line.strip().split(',')
@@ -141,8 +144,6 @@ class Records:
                     else:
                         self.load_group_tickets(ticket_data)
                     line = ticket_file.readline()
-                else:
-                    print("Finished reading ticket file without errors")
         except FileNotFoundError:
             print("Error : Please ensure the right file path is specified! File should be in "
                   "the current working directory.")
@@ -176,6 +177,18 @@ class Records:
             except InvalidEntryError:
                 print(f"Group ticket {ticket_data[0]} is not valid! Price of a group ticket needs to be "
                       f"equal to or higher than 50$")
+
+    def read_bookings(self, file_name):
+        """Loads the bookings from file"""
+        try:
+            with open(file_name, 'r') as booking_file:
+                line = booking_file.readline()
+                while line:
+                    self._existing_bookings.append(line.strip())
+                    line = booking_file.readline()
+        except FileNotFoundError:
+            print("Error : Please ensure the right file path is specified! File should be in "
+                  "the current working directory.")
 
     @staticmethod
     def calc_grp_price(tickets: dict) -> float:
